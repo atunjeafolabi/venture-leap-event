@@ -4,7 +4,7 @@
 This solution implements a REST API for logging events into a local database. Additionally, events are paginated and can be filtered by passing an event `type` query string.
 
 ## Installation:
-- Clone the project: ```git clone https://github.com/atunjeafolabi/venture-leap-events-api.git```
+- Clone the project: ```git clone https://github.com/atunjeafolabi/venture-leap-event.git```
 - Create a mysql database named ```venture-leap-event```
 - Rename ```.env.example``` to ```.env``` and fill it with the database credentials (username and password)
 - From the project root directory, run `composer install`
