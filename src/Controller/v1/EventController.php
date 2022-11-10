@@ -4,9 +4,11 @@ namespace App\Controller\v1;
 
 use App\Repository\EventRepository;
 use App\Transformer\Transformer;
+use App\Validator\EventValidator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class EventController extends AbstractController
@@ -19,10 +21,15 @@ class EventController extends AbstractController
      * @var Request
      */
     private $request;
+    /**
+     * @var EventValidator
+     */
+    private $validator;
 
-    public function __construct(EventRepository $eventRepository)
+    public function __construct(EventRepository $eventRepository, EventValidator $validator)
     {
         $this->eventRepository = $eventRepository;
+        $this->validator = $validator;
     }
 
     /**
@@ -57,15 +64,19 @@ class EventController extends AbstractController
      */
     public function create(Request $request): JsonResponse
     {
-        // TODO: validate incoming request parameters
-
         $eventData = [
             'details' => $request->get('details'),
             'type' => $request->get('type'),
         ];
 
+        $this->validator->validate($eventData);
+
+        if ($this->validator->hasErrors()) {
+            return $this->json($this->validator->getErrors(), Response::HTTP_BAD_REQUEST);
+        }
+
         $eventId = $this->eventRepository->createEvent($eventData);
 
-        return $this->json([], 201, ["Location" => "/events/" . $eventId]);
+        return $this->json([], Response::HTTP_CREATED, ["Location" => "/events/" . $eventId]);
     }
 }

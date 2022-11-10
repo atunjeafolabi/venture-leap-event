@@ -5,10 +5,13 @@ namespace App\Controller\v1;
 use App\Entity\Type;
 use App\Repository\TypeRepository;
 use App\Transformer\Transformer;
+use App\Validator\EventTypeValidator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
+
 
 class EventTypeController extends AbstractController
 {
@@ -17,9 +20,12 @@ class EventTypeController extends AbstractController
      */
     private $typeRepository;
 
-    public function __construct(TypeRepository $typeRepository)
+    private $validator;
+
+    public function __construct(TypeRepository $typeRepository, EventTypeValidator $validator)
     {
         $this->typeRepository = $typeRepository;
+        $this->validator = $validator;
     }
 
     /**
@@ -34,7 +40,7 @@ class EventTypeController extends AbstractController
 
         return $this->json(
             (new Transformer())->transformCollection($eventTypes),
-            200
+            Response::HTTP_CREATED
         );
     }
 
@@ -49,13 +55,17 @@ class EventTypeController extends AbstractController
      */
     public function create(Request $request): JsonResponse
     {
-        // TODO: validate incoming request parameters
+        $this->validator->validate($request->get('type'));
+
+        if ($this->validator->hasErrors()) {
+            return $this->json($this->validator->getErrors(), Response::HTTP_BAD_REQUEST);
+        }
 
         $type = new Type();
         $type->setName($request->get('type'));
 
         $this->typeRepository->add($type);
 
-        return $this->json([], 201, ["Location" => "/types/" . $type->getId()]);
+        return $this->json([], Response::HTTP_CREATED, ["Location" => "/types/" . $type->getId()]);
     }
 }
