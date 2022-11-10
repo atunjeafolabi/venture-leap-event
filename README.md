@@ -9,7 +9,7 @@ This solution implements a REST API for logging events into a local database. Ad
 - Rename ```.env.example``` to ```.env``` and fill it with the database credentials (username and password)
 - From the project root directory, run `composer install`
 - Run migrations ```php bin/console doctrine:migrations:migrate```
-- Input some related sample data into the database tables `events` and `types` in order to have something to work with
+- Load some sample data into the database in order to have something to work with ```php bin/console doctrine:fixtures:load```
 - Run local dev server: ```symfony server:start``` 
 
 ## Usage:
@@ -132,11 +132,12 @@ To speed up development, the following bundles were used to handle tasks like pa
 - knplabs/knp-paginator-bundle
 - symfony-bundles/json-request-bundle
 - doctrine/orm
+- doctrine/doctrine-fixtures-bundle
+- fzaninotto/faker
 
 ### Future Works
-- Validation still needs to be added when creating or updating an event.
+- Validation still needs to be improved when creating or updating an event.
 - More refactoring can still be done on the codebase
-- Seeders can be added for easily loading sample data into the database
 
 ### Issues
 - Kindly let me know if any issues are encountered.
